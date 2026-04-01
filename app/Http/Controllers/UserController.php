@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -76,7 +77,7 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
-        abort_if($user->is(auth()->user()), 403, 'No puedes eliminar tu propia cuenta.');
+        abort_if($user->getKey() === Auth::id(), 403, 'No puedes eliminar tu propia cuenta.');
 
         $user->delete();
 
