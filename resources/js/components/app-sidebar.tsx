@@ -1,5 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Package, Tag, Users } from 'lucide-react';
+import { index as categoriesIndex } from '@/actions/App/Http/Controllers/CategoryController';
+import { index as customersIndex } from '@/actions/App/Http/Controllers/CustomerController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -21,6 +24,21 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Clientes',
+        href: customersIndex.url(),
+        icon: Users,
+    },
+    {
+        title: 'Productos',
+        href: productsIndex.url(),
+        icon: Package,
+    },
+    {
+        title: 'Categorías',
+        href: categoriesIndex.url(),
+        icon: Tag,
     },
 ];
 

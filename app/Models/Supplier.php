@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\SupplierFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+#[Fillable(['name', 'contact_name', 'email', 'phone', 'address', 'is_active'])]
+class Supplier extends Model
+{
+    /** @use HasFactory<SupplierFactory> */
+    use HasFactory, SoftDeletes;
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+}
