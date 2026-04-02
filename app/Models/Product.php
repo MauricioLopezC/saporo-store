@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductUnit;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +22,7 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'cost' => 'decimal:2',
+            'unit' => ProductUnit::class,
             'is_active' => 'boolean',
         ];
     }

@@ -13,12 +13,19 @@ interface Option {
     name: string;
 }
 
+interface UnitOption {
+    value: string;
+    label: string;
+}
+
 export default function ProductsCreate({
     categories,
     suppliers,
+    units,
 }: {
     categories: Option[];
     suppliers: Option[];
+    units: UnitOption[];
 }) {
     const { data, setData, post, processing, errors } = useForm({
         sku: '',
@@ -125,14 +132,23 @@ export default function ProductsCreate({
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="unit">Unidad *</Label>
-                            <Input
-                                id="unit"
+                            <Label>Unidad *</Label>
+                            <Select
                                 value={data.unit}
-                                onChange={(e) => setData('unit', e.target.value)}
-                                placeholder="Ej: unidad, kg, m"
+                                onValueChange={(v) => setData('unit', v)}
                                 required
-                            />
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Seleccionar unidad" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {units.map((u) => (
+                                        <SelectItem key={u.value} value={u.value}>
+                                            {u.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <InputError message={errors.unit} />
                         </div>
                     </div>

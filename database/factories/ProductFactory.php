@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ProductUnit;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -26,7 +27,7 @@ class ProductFactory extends Factory
             'description' => fake()->optional()->sentence(),
             'price' => fake()->randomFloat(2, 1, 10000),
             'cost' => fake()->optional()->randomFloat(2, 1, 5000),
-            'unit' => fake()->randomElement(['unidad', 'kg', 'm', 'm²', 'litro', 'caja']),
+            'unit' => fake()->randomElement(ProductUnit::cases())->value,
             'category_id' => Category::factory(),
             'supplier_id' => fake()->optional() ? Supplier::factory() : null,
             'is_active' => true,

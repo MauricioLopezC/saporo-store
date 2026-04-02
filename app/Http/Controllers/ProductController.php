@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProductUnit;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
@@ -29,6 +30,7 @@ class ProductController extends Controller
         return Inertia::render('products/create', [
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'units' => collect(ProductUnit::cases())->map(fn ($u) => ['value' => $u->value, 'label' => $u->label()]),
         ]);
     }
 
@@ -53,6 +55,7 @@ class ProductController extends Controller
             'product' => $product,
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'units' => collect(ProductUnit::cases())->map(fn ($u) => ['value' => $u->value, 'label' => $u->label()]),
         ]);
     }
 

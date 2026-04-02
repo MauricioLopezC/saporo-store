@@ -62,6 +62,7 @@ export default function SalesCreate({
     });
 
     const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
+    const integerUnits = ['unidad', 'caja', 'docena', 'par'];
 
     function addItem() {
         setData('items', [...data.items, emptyItem()]);
@@ -214,8 +215,8 @@ export default function SalesCreate({
                                             <td className="px-3 py-2">
                                                 <Input
                                                     type="number"
-                                                    min="0.001"
-                                                    step="0.001"
+                                                    min={integerUnits.includes(productMap[item.product_id as number]?.unit ?? '') ? '1' : '0.001'}
+                                                    step={integerUnits.includes(productMap[item.product_id as number]?.unit ?? '') ? '1' : '0.001'}
                                                     value={item.quantity}
                                                     onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                                                     required

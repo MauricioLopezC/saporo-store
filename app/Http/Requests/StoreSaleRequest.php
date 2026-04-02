@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -26,7 +27,18 @@ class StoreSaleRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
-            'items.*.quantity' => ['required', 'numeric', 'min:0.001'],
+            'items.*.quantity' => [
+                'required',
+                'numeric',
+                'min:0.001',
+                function ($attribute, $value, $fail) {
+                    $index = explode('.', $attribute)[1];
+                    $product = Product::find($this->input("items.{$index}.product_id"));
+                    if ($product?->unit?->isInteger() && floor((float) $value) != (float) $value) {
+                        $fail("La cantidad para '{$product->unit->label()}' debe ser un número entero.");
+                    }
+                },
+            ],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount' => ['nullable', 'numeric', 'min:0'],
         ];
