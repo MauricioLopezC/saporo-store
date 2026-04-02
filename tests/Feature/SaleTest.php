@@ -2,7 +2,6 @@
 
 use App\Enums\SaleStatus;
 use App\Models\Branch;
-use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Sale;
@@ -194,4 +193,107 @@ test('destroy soft deletes a sale', function () {
         ->assertRedirect(route('sales.index'));
 
     $this->assertSoftDeleted($sale);
+});
+
+test('destroy completed sale reverses stock and creates stock movement', function () {
+    $branch = Branch::factory()->create();
+    $product = Product::factory()->create();
+    ProductStock::factory()->create(['product_id' => $product->id, 'branch_id' => $branch->id, 'stock' => 5]);
+
+    $sale = Sale::factory()->create(['branch_id' => $branch->id, 'status' => 'COMPLETED']);
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 3,
+        'unit_price' => 10,
+        'discount' => 0,
+        'subtotal' => 30,
+    ]);
+
+    $this->delete(route('sales.destroy', $sale))
+        ->assertRedirect(route('sales.index'));
+
+    $this->assertSoftDeleted($sale);
+    expect(ProductStock::first()->stock)->toBe(8);
+    expect(StockMovement::count())->toBe(1);
+
+    $movement = StockMovement::first();
+    expect($movement->type->value)->toBe('IN');
+    expect($movement->previous_stock)->toBe(5);
+    expect($movement->current_stock)->toBe(8);
+    expect($movement->reason)->toContain('Reversión venta');
+});
+
+test('destroy pending sale does not create stock movement', function () {
+    $sale = Sale::factory()->pending()->create();
+
+    $this->delete(route('sales.destroy', $sale))
+        ->assertRedirect(route('sales.index'));
+
+    $this->assertSoftDeleted($sale);
+    expect(StockMovement::count())->toBe(0);
+});
+
+test('store rejects completed sale when stock is insufficient', function () {
+    $branch = Branch::factory()->create();
+    $product = Product::factory()->create(['price' => 50]);
+    ProductStock::factory()->create(['product_id' => $product->id, 'branch_id' => $branch->id, 'stock' => 3]);
+
+    $this->post(route('sales.store'), [
+        'branch_id' => $branch->id,
+        'customer_id' => null,
+        'status' => 'COMPLETED',
+        'discount' => 0,
+        'tax' => 0,
+        'notes' => null,
+        'items' => [
+            ['product_id' => $product->id, 'quantity' => 5, 'unit_price' => 50, 'discount' => 0],
+        ],
+    ])->assertSessionHasErrors('items.0.quantity');
+
+    expect(Sale::count())->toBe(0);
+});
+
+test('store allows pending sale when stock is insufficient', function () {
+    $branch = Branch::factory()->create();
+    $product = Product::factory()->create(['price' => 50]);
+    ProductStock::factory()->create(['product_id' => $product->id, 'branch_id' => $branch->id, 'stock' => 3]);
+
+    $this->post(route('sales.store'), [
+        'branch_id' => $branch->id,
+        'customer_id' => null,
+        'status' => 'PENDING',
+        'discount' => 0,
+        'tax' => 0,
+        'notes' => null,
+        'items' => [
+            ['product_id' => $product->id, 'quantity' => 5, 'unit_price' => 50, 'discount' => 0],
+        ],
+    ])->assertRedirect();
+
+    expect(Sale::count())->toBe(1);
+});
+
+test('update to completed rejects when stock is insufficient', function () {
+    $branch = Branch::factory()->create();
+    $product = Product::factory()->create();
+    ProductStock::factory()->create(['product_id' => $product->id, 'branch_id' => $branch->id, 'stock' => 2]);
+
+    $sale = Sale::factory()->pending()->create(['branch_id' => $branch->id]);
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 5,
+        'unit_price' => 10,
+        'discount' => 0,
+        'subtotal' => 50,
+    ]);
+
+    $this->put(route('sales.update', $sale), [
+        'status' => 'COMPLETED',
+        'discount' => 0,
+        'tax' => 0,
+        'notes' => null,
+    ])->assertSessionHasErrors('status');
+
+    expect($sale->fresh()->status->value)->toBe('PENDING');
+    expect(StockMovement::count())->toBe(0);
 });

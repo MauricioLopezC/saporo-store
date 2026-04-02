@@ -9,6 +9,7 @@ declare module '@inertiajs/core' {
             flash: {
                 success?: string;
             };
+            lowStockCount: number;
             [key: string]: unknown;
         };
     }

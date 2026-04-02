@@ -20,11 +20,12 @@ class ProductStockController extends Controller
             'stocks' => ProductStock::query()
                 ->with('product:id,name,sku', 'branch:id,name')
                 ->when($request->branch_id, fn ($q) => $q->where('branch_id', $request->branch_id))
+                ->when($request->low_stock, fn ($q) => $q->whereColumn('stock', '<=', 'min_stock'))
                 ->orderBy('branch_id')
                 ->paginate(20)
                 ->withQueryString(),
             'branches' => Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'filters' => $request->only('branch_id'),
+            'filters' => $request->only('branch_id', 'low_stock'),
         ]);
     }
 

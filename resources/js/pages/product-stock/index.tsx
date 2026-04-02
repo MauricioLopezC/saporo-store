@@ -34,12 +34,12 @@ export default function ProductStockIndex({
 }: {
     stocks: PaginatedStocks;
     branches: Branch[];
-    filters: { branch_id?: string };
+    filters: { branch_id?: string; low_stock?: string };
 }) {
     const { flash } = usePage().props;
 
-    function handleBranchFilter(e: React.ChangeEvent<HTMLSelectElement>) {
-        router.get(stockIndex.url(), { branch_id: e.target.value || undefined }, { preserveState: true, replace: true });
+    function handleFilter(key: string, value: string) {
+        router.get(stockIndex.url(), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
     }
 
     return (
@@ -57,7 +57,7 @@ export default function ProductStockIndex({
                     <div className="flex items-center gap-3">
                         <select
                             value={filters.branch_id ?? ''}
-                            onChange={handleBranchFilter}
+                            onChange={(e) => handleFilter('branch_id', e.target.value)}
                             className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                         >
                             <option value="">Todas las sucursales</option>
@@ -67,6 +67,13 @@ export default function ProductStockIndex({
                                 </option>
                             ))}
                         </select>
+                        <Button
+                            variant={filters.low_stock ? 'destructive' : 'outline'}
+                            size="sm"
+                            onClick={() => handleFilter('low_stock', filters.low_stock ? '' : '1')}
+                        >
+                            Stock bajo
+                        </Button>
                         <Button asChild>
                             <Link href={ProductStockController.create.url()}>
                                 <PlusIcon />

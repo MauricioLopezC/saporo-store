@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -36,6 +37,20 @@ class StoreSaleRequest extends FormRequest
                     $product = Product::find($this->input("items.{$index}.product_id"));
                     if ($product?->unit?->isInteger() && floor((float) $value) != (float) $value) {
                         $fail("La cantidad para '{$product->unit->label()}' debe ser un número entero.");
+                    }
+                },
+                function ($attribute, $value, $fail) {
+                    if ($this->input('status') !== 'COMPLETED') {
+                        return;
+                    }
+                    $index = explode('.', $attribute)[1];
+                    $productId = $this->input("items.{$index}.product_id");
+                    $branchId = $this->input('branch_id');
+                    $available = ProductStock::where('product_id', $productId)
+                        ->where('branch_id', $branchId)
+                        ->value('stock') ?? 0;
+                    if ($value > $available) {
+                        $fail("Stock insuficiente. Disponible: {$available}");
                     }
                 },
             ],

@@ -143,10 +143,44 @@ class SaleController extends Controller
 
     public function destroy(Sale $sale): RedirectResponse
     {
-        $sale->delete();
+        DB::transaction(function () use ($sale) {
+            if ($sale->status === SaleStatus::Completed) {
+                $this->reverseStockOut($sale->loadMissing('items'));
+            }
+            $sale->delete();
+        });
 
         return to_route('sales.index')
             ->with('success', "Venta {$sale->sale_number} eliminada correctamente.");
+    }
+
+    private function reverseStockOut(Sale $sale): void
+    {
+        foreach ($sale->items as $item) {
+            $stock = ProductStock::where('product_id', $item->product_id)
+                ->where('branch_id', $sale->branch_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $stock) {
+                continue;
+            }
+
+            $previous = $stock->stock;
+            $stock->increment('stock', $item->quantity);
+
+            StockMovement::create([
+                'product_id' => $item->product_id,
+                'branch_id' => $sale->branch_id,
+                'user_id' => Auth::id(),
+                'type' => StockMovementType::In,
+                'quantity' => $item->quantity,
+                'previous_stock' => $previous,
+                'current_stock' => $previous + $item->quantity,
+                'reason' => "Reversión venta {$sale->sale_number}",
+                'reference_id' => $sale->id,
+            ]);
+        }
     }
 
     private function processStockOut(Sale $sale): void
