@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\SaleStatus;
 use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +27,11 @@ class Sale extends Model
             'tax' => 'decimal:2',
             'total' => 'decimal:2',
         ];
+    }
+
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('status', SaleStatus::Completed);
     }
 
     public function branch(): BelongsTo
