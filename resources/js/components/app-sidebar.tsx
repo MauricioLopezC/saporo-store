@@ -1,9 +1,11 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, FolderGit2, LayoutGrid, Package, ShieldCheck, Tag, Users } from 'lucide-react';
+import { BookOpen, Building2, FolderGit2, LayoutGrid, Package, ShieldCheck, Tag, Truck, Users, Warehouse } from 'lucide-react';
 import { index as branchesIndex } from '@/actions/App/Http/Controllers/BranchController';
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/CategoryController';
 import { index as customersIndex } from '@/actions/App/Http/Controllers/CustomerController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
+import { index as productStockIndex } from '@/actions/App/Http/Controllers/ProductStockController';
+import { index as suppliersIndex } from '@/actions/App/Http/Controllers/SupplierController';
 import { index as usersIndex } from '@/actions/App/Http/Controllers/UserController';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -41,6 +43,16 @@ const mainNavItems: NavItem[] = [
         title: 'Categorías',
         href: categoriesIndex.url(),
         icon: Tag,
+    },
+    {
+        title: 'Proveedores',
+        href: suppliersIndex.url(),
+        icon: Truck,
+    },
+    {
+        title: 'Inventario',
+        href: productStockIndex.url(),
+        icon: Warehouse,
     },
     {
         title: 'Sucursales',

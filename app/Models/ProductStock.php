@@ -14,6 +14,8 @@ class ProductStock extends Model
     /** @use HasFactory<ProductStockFactory> */
     use HasFactory;
 
+    protected $table = 'product_stock';
+
     public $timestamps = false;
 
     public function product(): BelongsTo

@@ -4,6 +4,8 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductStockController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('users', UserController::class)->except('show');
     Route::resource('branches', BranchController::class)->except('show');
+    Route::resource('suppliers', SupplierController::class)->except('show');
+    Route::resource('product-stock', ProductStockController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 });
 
 require __DIR__.'/settings.php';
