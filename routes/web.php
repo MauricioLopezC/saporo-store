@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
@@ -15,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class)->except('show');
     Route::resource('products', ProductController::class);
     Route::resource('users', UserController::class)->except('show');
+    Route::resource('branches', BranchController::class)->except('show');
 });
 
 require __DIR__.'/settings.php';
