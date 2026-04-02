@@ -18,14 +18,29 @@ interface UnitOption {
     label: string;
 }
 
+function deriveCategoryPrefix(name: string): string {
+    const stripped = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const words = stripped.trim().split(/\s+/);
+    if (words.length > 1) {
+        return words
+            .map((w) => w.replace(/[^a-zA-Z]/g, '')[0] ?? '')
+            .join('')
+            .toUpperCase()
+            .slice(0, 4);
+    }
+    return stripped.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4);
+}
+
 export default function ProductsCreate({
     categories,
     suppliers,
     units,
+    nextProductCount,
 }: {
     categories: Option[];
     suppliers: Option[];
     units: UnitOption[];
+    nextProductCount: number;
 }) {
     const { data, setData, post, processing, errors } = useForm({
         sku: '',
@@ -39,6 +54,18 @@ export default function ProductsCreate({
         supplier_id: '',
         is_active: true,
     });
+
+    function handleCategoryChange(categoryId: string) {
+        setData('category_id', categoryId);
+        if (!data.sku) {
+            const category = categories.find((c) => String(c.id) === categoryId);
+            if (category) {
+                const prefix = deriveCategoryPrefix(category.name);
+                const seq = String(nextProductCount).padStart(4, '0');
+                setData('sku', `${prefix}-${seq}`);
+            }
+        }
+    }
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
@@ -158,7 +185,7 @@ export default function ProductsCreate({
                             <Label>Categoría *</Label>
                             <Select
                                 value={data.category_id}
-                                onValueChange={(v) => setData('category_id', v)}
+                                onValueChange={handleCategoryChange}
                                 required
                             >
                                 <SelectTrigger className="w-full">
