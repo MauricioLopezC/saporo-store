@@ -35,8 +35,9 @@ export default function UsersIndex({
 
     const roleLabel = (value: string) => roles.find((r) => r.value === value)?.label ?? value;
 
+    const isAdmin = auth.user.role === 'admin';
+
     function handleDelete(user: User) {
-        if (user.id === auth.user.id) return;
         if (confirm(`¿Eliminar al usuario "${user.name}"?`)) {
             router.delete(UserController.destroy.url(user));
         }
@@ -108,16 +109,17 @@ export default function UsersIndex({
                                                     <span className="sr-only">Editar</span>
                                                 </Link>
                                             </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-destructive hover:text-destructive disabled:opacity-30"
-                                                disabled={user.id === auth.user.id}
-                                                onClick={() => handleDelete(user)}
-                                            >
-                                                <TrashIcon />
-                                                <span className="sr-only">Eliminar</span>
-                                            </Button>
+                                            {isAdmin && user.id !== auth.user.id && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-destructive hover:text-destructive"
+                                                    onClick={() => handleDelete(user)}
+                                                >
+                                                    <TrashIcon />
+                                                    <span className="sr-only">Eliminar</span>
+                                                </Button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
