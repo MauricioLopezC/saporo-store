@@ -88,7 +88,7 @@ class ProductController extends Controller
         $prefix = $this->deriveCategoryPrefix($category?->name ?? 'PROD');
         $count = Product::withTrashed()->where('category_id', $categoryId)->count() + 1;
 
-        return $prefix.'-'.str_pad($count, 4, '0', STR_PAD_LEFT);
+        return $prefix . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 
     private function deriveCategoryPrefix(string $name): string
