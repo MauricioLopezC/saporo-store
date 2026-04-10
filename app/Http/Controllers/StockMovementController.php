@@ -6,17 +6,18 @@ use App\Enums\StockMovementType;
 use App\Http\Requests\StoreStockMovementRequest;
 use App\Models\Branch;
 use App\Models\Product;
-use App\Models\ProductStock;
 use App\Models\StockMovement;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class StockMovementController extends Controller
 {
+    public function __construct(private readonly StockService $stockService) {}
+
     public function index(Request $request): Response
     {
         return Inertia::render('stock-movements/index', [
@@ -49,36 +50,7 @@ class StockMovementController extends Controller
 
     public function store(StoreStockMovementRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-
-        DB::transaction(function () use ($data) {
-            $stock = ProductStock::where('product_id', $data['product_id'])
-                ->where('branch_id', $data['branch_id'])
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $previous = $stock->stock;
-
-            if ($data['type'] === StockMovementType::In->value) {
-                $stock->increment('stock', $data['quantity']);
-                $current = $previous + $data['quantity'];
-            } else {
-                $newStock = max(0, $previous + $data['quantity']);
-                $stock->update(['stock' => $newStock]);
-                $current = $newStock;
-            }
-
-            StockMovement::create([
-                'product_id' => $data['product_id'],
-                'branch_id' => $data['branch_id'],
-                'user_id' => Auth::id(),
-                'type' => $data['type'],
-                'quantity' => abs($data['quantity']),
-                'previous_stock' => $previous,
-                'current_stock' => $current,
-                'reason' => $data['reason'],
-            ]);
-        });
+        DB::transaction(fn () => $this->stockService->applyMovement($request->validated()));
 
         return to_route('stock-movements.index')
             ->with('success', 'Movimiento de stock registrado correctamente.');
