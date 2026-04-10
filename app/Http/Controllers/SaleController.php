@@ -40,7 +40,7 @@ class SaleController extends Controller
         return Inertia::render('sales/create', [
             'branches' => Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'customers' => Customer::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'products' => Product::query()->where('is_active', true)->orderBy('name')->get(['id', 'name', 'sku', 'price', 'unit']),
+            'products' => Product::query()->where('is_active', true)->orderBy('name')->get(['id', 'name', 'sku', 'barcode', 'price', 'unit']),
         ]);
     }
 

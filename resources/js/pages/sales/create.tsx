@@ -3,6 +3,7 @@ import { PlusIcon, TrashIcon } from 'lucide-react';
 import SaleController, { index as salesIndex } from '@/actions/App/Http/Controllers/SaleController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import ProductSearchSelect from '@/components/product-search-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ interface Product {
     id: number;
     name: string;
     sku: string;
+    barcode: string | null;
     price: string;
     unit: string;
 }
@@ -197,19 +199,12 @@ export default function SalesCreate({
                                     {data.items.map((item, index) => (
                                         <tr key={index}>
                                             <td className="px-3 py-2">
-                                                <select
+                                                <ProductSearchSelect
+                                                    products={products}
                                                     value={item.product_id}
-                                                    onChange={(e) => updateItem(index, 'product_id', Number(e.target.value))}
+                                                    onChange={(id) => updateItem(index, 'product_id', id)}
                                                     required
-                                                    className={selectClass}
-                                                >
-                                                    <option value="">Selecciona</option>
-                                                    {products.map((p) => (
-                                                        <option key={p.id} value={p.id}>
-                                                            [{p.sku}] {p.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                />
                                                 <InputError message={(errors as any)[`items.${index}.product_id`]} />
                                             </td>
                                             <td className="px-3 py-2">
