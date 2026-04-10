@@ -26,7 +26,7 @@ class SaleService
     public function create(array $data): Sale
     {
         return DB::transaction(function () use ($data) {
-            $saleNumber = 'VTA-' . str_pad(Sale::withTrashed()->count() + 1, 6, '0', STR_PAD_LEFT);
+            $saleNumber = 'VTA-'.str_pad(Sale::withTrashed()->count() + 1, 6, '0', STR_PAD_LEFT);
 
             $itemSubtotals = collect($data['items'])->map(function ($item) {
                 $discount = $item['discount'] ?? 0;

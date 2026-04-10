@@ -41,7 +41,7 @@ class DashboardService
             ->groupBy('fecha')
             ->orderBy('fecha')
             ->get()
-            ->map(fn($row) => [
+            ->map(fn ($row) => [
                 'fecha' => $row->fecha,
                 'total' => (float) $row->total,
             ]);
@@ -61,7 +61,7 @@ class DashboardService
             ->orderByDesc('total_vendido')
             ->limit(5)
             ->get()
-            ->map(fn($row) => [
+            ->map(fn ($row) => [
                 'name' => $row->name,
                 'total_vendido' => (float) $row->total_vendido,
                 'total_facturado' => (float) $row->total_facturado,
@@ -82,7 +82,7 @@ class DashboardService
             ->groupBy('categories.id', 'categories.name')
             ->orderByDesc('total')
             ->get()
-            ->map(fn($row) => [
+            ->map(fn ($row) => [
                 'name' => $row->name,
                 'total' => (float) $row->total,
             ]);
@@ -94,7 +94,7 @@ class DashboardService
             ->latest()
             ->limit(5)
             ->get(['id', 'sale_number', 'customer_id', 'status', 'total', 'created_at'])
-            ->map(fn($sale) => [
+            ->map(fn ($sale) => [
                 'id' => $sale->id,
                 'sale_number' => $sale->sale_number,
                 'customer' => $sale->customer?->name ?? 'Consumidor final',
@@ -112,7 +112,7 @@ class DashboardService
             ->orderByRaw('(stock - min_stock) ASC')
             ->limit(10)
             ->get()
-            ->map(fn($s) => [
+            ->map(fn ($s) => [
                 'sku' => $s->product->sku,
                 'name' => $s->product->name,
                 'branch' => $s->branch->name,
