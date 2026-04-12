@@ -15,10 +15,11 @@ test('index lists product stock', function () {
 
     $this->get(route('product-stock.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('product-stock/index')
-            ->has('stocks.data', 3)
-            ->has('branches')
+        ->assertInertia(
+            fn($page) => $page
+                ->component('product-stock/index')
+                ->has('stocks.data', 3)
+                ->has('branches')
         );
 });
 
@@ -35,18 +36,20 @@ test('index filters by branch', function () {
 
     $this->get(route('product-stock.index', ['branch_id' => $branch->id]))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->has('stocks.data', 2)
+        ->assertInertia(
+            fn($page) => $page
+                ->has('stocks.data', 2)
         );
 });
 
 test('create page renders with products and branches', function () {
     $this->get(route('product-stock.create'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('product-stock/create')
-            ->has('products')
-            ->has('branches')
+        ->assertInertia(
+            fn($page) => $page
+                ->component('product-stock/create')
+                ->has('products')
+                ->has('branches')
         );
 });
 
@@ -94,9 +97,10 @@ test('edit page renders', function () {
 
     $this->get(route('product-stock.edit', $stock))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('product-stock/edit')
-            ->has('stock')
+        ->assertInertia(
+            fn($page) => $page
+                ->component('product-stock/edit')
+                ->has('stock')
         );
 });
 

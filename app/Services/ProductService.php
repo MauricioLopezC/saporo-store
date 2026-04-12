@@ -13,7 +13,7 @@ class ProductService
         $prefix = $this->deriveCategoryPrefix($category?->name ?? 'PROD');
         $count = Product::withTrashed()->where('category_id', $categoryId)->count() + 1;
 
-        return $prefix . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        return $prefix.'-'.str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 
     private function deriveCategoryPrefix(string $name): string
@@ -28,7 +28,7 @@ class ProductService
 
         if (count($words) > 1) {
             $initials = implode('', array_map(
-                fn($w) => strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $w), 0, 1)),
+                fn ($w) => strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $w), 0, 1)),
                 $words
             ));
 
