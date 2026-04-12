@@ -2,6 +2,7 @@
 
 use App\Models\Supplier;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -20,7 +21,7 @@ test('index lists suppliers', function () {
 });
 
 test('guests cannot access suppliers', function () {
-    auth()->logout();
+    Auth::logout();
 
     $this->get(route('suppliers.index'))->assertRedirect(route('login'));
 });

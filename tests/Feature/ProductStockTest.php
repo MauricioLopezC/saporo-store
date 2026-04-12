@@ -4,6 +4,7 @@ use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -24,7 +25,7 @@ test('index lists product stock', function () {
 });
 
 test('guests cannot access product stock', function () {
-    auth()->logout();
+    Auth::logout();
 
     $this->get(route('product-stock.index'))->assertRedirect(route('login'));
 });

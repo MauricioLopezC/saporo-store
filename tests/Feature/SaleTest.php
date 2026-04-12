@@ -7,6 +7,7 @@ use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -27,7 +28,7 @@ test('index lists sales', function () {
 });
 
 test('guests cannot access sales', function () {
-    auth()->logout();
+    Auth::logout();
 
     $this->get(route('sales.index'))->assertRedirect(route('login'));
 });

@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\StockMovement;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -40,7 +41,7 @@ test('index lists stock movements', function () {
 });
 
 test('guests cannot access stock movements', function () {
-    auth()->logout();
+    Auth::logout();
 
     $this->get(route('stock-movements.index'))->assertRedirect(route('login'));
 });

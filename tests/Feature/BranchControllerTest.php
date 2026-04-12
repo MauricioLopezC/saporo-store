@@ -2,6 +2,7 @@
 
 use App\Models\Branch;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -20,7 +21,7 @@ test('index lists branches', function () {
 });
 
 test('guests cannot access branches', function () {
-    auth()->logout();
+    Auth::logout();
 
     $this->get(route('branches.index'))->assertRedirect(route('login'));
 });
