@@ -13,6 +13,7 @@ test('security page is displayed', function () {
         'confirmPassword' => true,
     ]);
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -28,6 +29,7 @@ test('security page is displayed', function () {
 test('security page requires password confirmation when enabled', function () {
     $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     Features::twoFactorAuthentication([
@@ -44,6 +46,7 @@ test('security page requires password confirmation when enabled', function () {
 test('security page does not require password confirmation when disabled', function () {
     $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     Features::twoFactorAuthentication([
@@ -66,6 +69,7 @@ test('security page renders without two factor when feature is disabled', functi
 
     $user = User::factory()->create();
 
+    /** @var User $user */
     $this->actingAs($user)
         ->get(route('security.edit'))
         ->assertOk()
@@ -78,6 +82,7 @@ test('security page renders without two factor when feature is disabled', functi
 });
 
 test('password can be updated', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     $response = $this
@@ -99,6 +104,7 @@ test('password can be updated', function () {
 test('correct password must be provided to update password', function () {
     $user = User::factory()->create();
 
+    /** @var User $user */
     $response = $this
         ->actingAs($user)
         ->from(route('security.edit'))

@@ -71,6 +71,7 @@ test('email is not verified with invalid user id', function () {
 });
 
 test('verified user is redirected to dashboard from verification prompt', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     Event::fake();
@@ -82,6 +83,7 @@ test('verified user is redirected to dashboard from verification prompt', functi
 });
 
 test('already verified user visiting verification link is redirected without firing event again', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     Event::fake();
