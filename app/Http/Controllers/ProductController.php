@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,14 +18,19 @@ class ProductController extends Controller
 {
     public function __construct(private readonly ProductService $productService) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
         return Inertia::render('products/index', [
             'products' => Product::query()
                 ->with('category:id,name', 'supplier:id,name')
+                ->when($request->search, fn ($q) => $q->where(
+                    fn ($q) => $q->where('name', 'like', "%{$request->search}%")
+                        ->orWhere('barcode', 'like', "%{$request->search}%")
+                ))
                 ->orderBy('name')
                 ->paginate(20)
                 ->withQueryString(),
+            'filters' => $request->only('search'),
         ]);
     }
 

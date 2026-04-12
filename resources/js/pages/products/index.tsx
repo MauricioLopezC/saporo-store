@@ -1,8 +1,10 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-react';
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, SearchIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import ProductController, { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface Product {
     id: number;
@@ -23,8 +25,23 @@ interface PaginatedProducts {
     links: { url: string | null; label: string; active: boolean }[];
 }
 
-export default function ProductsIndex({ products }: { products: PaginatedProducts }) {
+export default function ProductsIndex({
+    products,
+    filters,
+}: {
+    products: PaginatedProducts;
+    filters: { search?: string };
+}) {
     const { flash } = usePage().props;
+    const [search, setSearch] = useState(filters.search ?? '');
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.get(productsIndex.url(), { ...filters, search: search || undefined }, { preserveState: true, replace: true });
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
 
     function handleDelete(product: Product) {
         if (confirm(`¿Eliminar el producto "${product.name}"?`)) {
@@ -52,6 +69,16 @@ export default function ProductsIndex({ products }: { products: PaginatedProduct
                     </Button>
                 </div>
 
+                <div className="relative w-72">
+                    <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        placeholder="Buscar por nombre o barcode..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-9"
+                    />
+                </div>
+
                 {flash.success && (
                     <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800/30 dark:bg-green-900/20 dark:text-green-400">
                         {flash.success}
@@ -75,7 +102,7 @@ export default function ProductsIndex({ products }: { products: PaginatedProduct
                             {products.data.length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                                        No hay productos registrados.
+                                        {search ? 'No se encontraron productos.' : 'No hay productos registrados.'}
                                     </td>
                                 </tr>
                             )}
