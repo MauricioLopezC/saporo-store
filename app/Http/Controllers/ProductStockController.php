@@ -19,13 +19,18 @@ class ProductStockController extends Controller
         return Inertia::render('product-stock/index', [
             'stocks' => ProductStock::query()
                 ->with('product:id,name,sku', 'branch:id,name')
+                ->when($request->search, fn ($q) => $q->whereHas(
+                    'product',
+                    fn ($q) => $q->where('name', 'like', "%{$request->search}%")
+                        ->orWhere('sku', 'like', "%{$request->search}%")
+                ))
                 ->when($request->branch_id, fn ($q) => $q->where('branch_id', $request->branch_id))
                 ->when($request->low_stock, fn ($q) => $q->whereColumn('stock', '<=', 'min_stock'))
                 ->orderBy('branch_id')
                 ->paginate(20)
                 ->withQueryString(),
             'branches' => Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'filters' => $request->only('branch_id', 'low_stock'),
+            'filters' => $request->only('search', 'branch_id', 'low_stock'),
         ]);
     }
 

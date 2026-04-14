@@ -1,9 +1,11 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { PlusIcon, PencilIcon } from 'lucide-react';
+import { PlusIcon, PencilIcon, SearchIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import ProductStockController from '@/actions/App/Http/Controllers/ProductStockController';
 import { index as stockIndex } from '@/actions/App/Http/Controllers/ProductStockController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ProductStock {
     id: number;
@@ -34,9 +36,18 @@ export default function ProductStockIndex({
 }: {
     stocks: PaginatedStocks;
     branches: Branch[];
-    filters: { branch_id?: string; low_stock?: string };
+    filters: { search?: string; branch_id?: string; low_stock?: string };
 }) {
     const { flash } = usePage().props;
+    const [search, setSearch] = useState(filters.search ?? '');
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.get(stockIndex.url(), { ...filters, search: search || undefined }, { preserveState: true, replace: true });
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
 
     function handleFilter(key: string, value: string) {
         router.get(stockIndex.url(), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
@@ -55,6 +66,15 @@ export default function ProductStockIndex({
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
+                        <div className="relative w-64">
+                            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar por nombre o SKU..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9"
+                            />
+                        </div>
                         <select
                             value={filters.branch_id ?? ''}
                             onChange={(e) => handleFilter('branch_id', e.target.value)}
@@ -106,7 +126,7 @@ export default function ProductStockIndex({
                             {stocks.data.length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                                        No hay registros de stock.
+                                        {search ? 'No se encontraron registros.' : 'No hay registros de stock.'}
                                     </td>
                                 </tr>
                             )}

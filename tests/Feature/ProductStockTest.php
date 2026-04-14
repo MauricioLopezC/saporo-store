@@ -17,7 +17,7 @@ test('index lists product stock', function () {
     $this->get(route('product-stock.index'))
         ->assertOk()
         ->assertInertia(
-            fn($page) => $page
+            fn ($page) => $page
                 ->component('product-stock/index')
                 ->has('stocks.data', 3)
                 ->has('branches')
@@ -30,6 +30,33 @@ test('guests cannot access product stock', function () {
     $this->get(route('product-stock.index'))->assertRedirect(route('login'));
 });
 
+test('index filters by product name', function () {
+    $product = Product::factory()->create(['name' => 'Leche Entera']);
+    ProductStock::factory()->create(['product_id' => $product->id]);
+    ProductStock::factory()->count(2)->create();
+
+    $this->get(route('product-stock.index', ['search' => 'leche']))
+        ->assertOk()
+        ->assertInertia(
+            fn ($page) => $page
+                ->has('stocks.data', 1)
+                ->where('stocks.data.0.product.name', 'Leche Entera')
+        );
+});
+
+test('index filters by product sku', function () {
+    $product = Product::factory()->create(['sku' => 'PROD-001']);
+    ProductStock::factory()->create(['product_id' => $product->id]);
+    ProductStock::factory()->count(2)->create();
+
+    $this->get(route('product-stock.index', ['search' => 'PROD-001']))
+        ->assertOk()
+        ->assertInertia(
+            fn ($page) => $page
+                ->has('stocks.data', 1)
+        );
+});
+
 test('index filters by branch', function () {
     $branch = Branch::factory()->create();
     ProductStock::factory()->count(2)->create(['branch_id' => $branch->id]);
@@ -38,7 +65,7 @@ test('index filters by branch', function () {
     $this->get(route('product-stock.index', ['branch_id' => $branch->id]))
         ->assertOk()
         ->assertInertia(
-            fn($page) => $page
+            fn ($page) => $page
                 ->has('stocks.data', 2)
         );
 });
@@ -47,7 +74,7 @@ test('create page renders with products and branches', function () {
     $this->get(route('product-stock.create'))
         ->assertOk()
         ->assertInertia(
-            fn($page) => $page
+            fn ($page) => $page
                 ->component('product-stock/create')
                 ->has('products')
                 ->has('branches')
@@ -99,7 +126,7 @@ test('edit page renders', function () {
     $this->get(route('product-stock.edit', $stock))
         ->assertOk()
         ->assertInertia(
-            fn($page) => $page
+            fn ($page) => $page
                 ->component('product-stock/edit')
                 ->has('stock')
         );
