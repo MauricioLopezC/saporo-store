@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Usuario administrador
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => config('admin.email')],
             [
                 'name' => config('admin.name'),
